@@ -46,8 +46,6 @@ jobs:
         EOL
       env:
         CommitHash: ${git_hash} #GITHUB_SHA
-         
-    - uses: actions/checkout@v1
     - name: Install surge and fire deployment
       uses: actions/setup-node@v1
       with:
