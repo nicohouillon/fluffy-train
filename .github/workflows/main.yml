@@ -36,15 +36,18 @@ jobs:
         # Only runs if all of the files exists
         run: echo Files exist -- Pass !
           
-#   build:
-#     runs-on: ubuntu-latest
-#     steps:
-#      - name: build html page
-#        run:
-#         echo: 
-       
-#        env:
-#          COMMIT_HASH: ${git_hash} #GITHUB_SHA
+  build:
+    runs-on: ubuntu-latest
+    steps:
+     - name: build html page
+       run: |
+          cat > index.html <<EOL
+          <html>
+           Hello World, I am deployed from ${{ github.sha }}!
+          </html>
+          EOL
+       env:
+         CommitHash: ${git_hash} #GITHUB_SHA
          
   deploy: 
     name: deploy code to Surge.sh
