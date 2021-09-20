@@ -1,0 +1,54 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+#  push:
+#   branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  test:
+    runs-on: ubuntu-latest
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+      
+    - name: Check file existence
+      id: check_files
+      uses: andstor/file-existence-action@v1
+      with:
+        files: "index.html"
+
+    - name: File exists
+      if: steps.check_files.outputs.files_exists == 'true'
+      # Only runs if all of the files exists
+      run: echo Files exist -- Pass !
+          
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: build html page
+      run: |
+        cat > index.html <<EOL
+        <html>
+         Hello World, I am deployed from ${{ github.sha }}!
+        </html>
+        EOL
+      env:
+        CommitHash: ${git_hash} #GITHUB_SHA
+    - name: Install surge and fire deployment
+      uses: actions/setup-node@v1
+      with:
+          node-version: 8
+    - run: npm install -g surge
+    - run: surge ./ ${{ secrets.SURGE_DOMAIN }} --token ${{ secrets.SURGE_TOKEN }}
